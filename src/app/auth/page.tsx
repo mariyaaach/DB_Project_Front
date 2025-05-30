@@ -30,7 +30,7 @@ export default function AuthPage() {
 
         try {
             const response = await axios.post(`${API_URL}/auth`, {username, password})
-            saveToken(response.data.token)
+            saveToken(response.data.accessToken)
             toast({
                 title: "Успешно",
                 description: "You have been successfully logged in.",
@@ -40,7 +40,8 @@ export default function AuthPage() {
             console.error('Error during login:', error)
             toast({
                 title: "Ошибка при авторизации",
-                // @ts-ignore
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-expect-error
                 description: error?.message,
                 variant: "destructive",
             })
@@ -67,7 +68,7 @@ export default function AuthPage() {
                 email,
                 role
             })
-            saveToken(response.data.token)
+            saveToken(response.data.accessToken)
             toast({
                 title: "Успешно!",
                 description: "Вы успешно создали аккаунт и теперь авторизованы.",
@@ -77,7 +78,8 @@ export default function AuthPage() {
             console.error('Error during registration:', error)
             toast({
                 title: "При регистрации произошла ошибка",
-                // @ts-ignore
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-expect-error
                 description: error?.message,
                 variant: "destructive",
             })

@@ -16,11 +16,11 @@ import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar"
 import {Input} from "@/components/ui/input"
 import {Sheet, SheetContent} from "@/components/ui/sheet"
 import {Menu, Search, X} from 'lucide-react'
-import axios from "axios";
-import {getRawToken, getSubFromToken} from "@/lib/jwtUtil";
-import {API_URL} from "@/lib/constants";
-import {toast} from "@/components/hooks/use-toast";
-import {User} from "@/app/types/types";
+import axios, { AxiosError } from "axios"
+import {getRawToken, getSubFromToken} from "@/lib/jwtUtil"
+import {API_URL} from "@/lib/constants"
+import {toast} from "@/components/hooks/use-toast"
+import {User} from "@/app/types/types"
 
 const mainNav = [
     {title: "Панель управления", href: "/dashboard"},
@@ -45,22 +45,30 @@ export function Navbar() {
             setUser(response.data)
         } catch (error) {
             console.error('Error fetching user data:', error)
+            const errorMessage = error instanceof AxiosError ? error.message : 'Неизвестная ошибка'
             toast({
                 title: "Ошибка",
-                description: `Ошибка при полкчении данных пользователя ${error?.message}`,
+                description: `Ошибка при получении данных пользователя: ${errorMessage}`,
                 variant: "destructive",
             })
-            // router.push('/')
         }
     }
-    axios.defaults.headers.common['Authorization'] = `Bearer ${getRawToken()}`
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const token = getRawToken()
+            if (token) {
+                axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+                fetchUserData()
+            }
+        }
+    }, [])
 
     useEffect(() => {
         const handleScroll = () => {
             setIsScrolled(window.scrollY > 0)
         }
         window.addEventListener('scroll', handleScroll)
-        fetchUserData()
         return () => window.removeEventListener('scroll', handleScroll)
     }, [])
 
